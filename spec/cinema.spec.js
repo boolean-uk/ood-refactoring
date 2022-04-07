@@ -1,16 +1,15 @@
-const Cinema = require("../src/cinema")
+const Cinema = require("../src/cinema.js");
 
 describe("Cinema", () => {
-  let cinema
+  let cinema;
 
   beforeEach(() => {
-    cinema = new Cinema()
-  })
+    cinema = new Cinema();
+  });
 
   it("creates new screens", () => {
-    cinema.save("Screen 1", 20)
-    cinema.save("Screen 2", 25)
-
+    cinema.createScreen("Screen 1", 20);
+    cinema.createScreen("Screen 2", 25);
     const expected = [
       {
         name: "Screen 1",
@@ -22,200 +21,213 @@ describe("Cinema", () => {
         capacity: 25,
         showings: [],
       },
-    ]
+    ];
 
-    expect(cinema.screens).toEqual(expected)
-  })
+    expect(cinema.screens).toEqual(expected);
+  });
 
   it("returns error trying to create duplicate screen", () => {
-    cinema.save("Screen 1", 20)
-    const result = cinema.save("Screen 1", 25)
+    cinema.createScreen("Screen 1", 20);
+    const result = cinema.createScreen("Screen 1", 25);
+    const expected = "Screen already exists";
+    expect(result).toEqual(expected);
+  });
 
-    const expected = "Screen already exists"
+  it("returns error trying to create screen over capacity", () => {
+    const result = cinema.createScreen("Screen 1", 250);
+    const expected = "Exceeded max capacity";
+    expect(result).toEqual(expected);
+  });
 
-    expect(result).toEqual(expected)
-  })
+  it("returns the rating is vaild", () => {
+    const result = cinema.isValidRating("U");
+    expect(result).toEqual(true);
+  });
 
-  it("adds new films", () => {
-    cinema.addNew("Nomad Land", "12", "1:48")
-    cinema.addNew("The Power of the Dog", "15", "2:08")
+  it("returns the rating is vaild", () => {
+    const result = cinema.isValidRating("UUU");
+    expect(result).toEqual(false);
+  });
 
+  it("returns the time is vaild", () => {
+    const result = cinema.isValidTime("2:40");
+    expect(result).toEqual(true);
+  });
+
+  it("returns the time is invaild", () => {
+    const result = cinema.isValidTime("34:70");
+    expect(result).toEqual(false);
+  });
+
+  it("returns the time is invaild", () => {
+    const result = cinema.isValidTime("340");
+    expect(result).toEqual(false);
+  });
+
+  it("creates a new film", () => {
+    cinema.createFilm("Nomad Land", "12", "1:48");
     const expected = [
       {
         name: "Nomad Land",
         rating: "12",
         duration: "1:48",
       },
-      {
-        name: "The Power of the Dog",
-        rating: "15",
-        duration: "2:08",
-      },
-    ]
-
-    expect(cinema.films).toEqual(expected)
-  })
+    ];
+    expect(cinema.films).toEqual(expected);
+  });
 
   it("returns error trying to create duplicate film", () => {
-    cinema.addNew("Nomad Land", "12", "1:48")
-    const result = cinema.addNew("Nomad Land", "15", "2:08")
-
-    const expected = "Film already exists"
-
-    expect(result).toEqual(expected)
-  })
+    cinema.createFilm("Nomad Land", "12", "1:48");
+    const result = cinema.createFilm("Nomad Land", "15", "2:08");
+    const expected = "Film already exists";
+    expect(result).toEqual(expected);
+  });
 
   it("returns error trying to create film with invalid rating", () => {
-    const invalidRatings = ["20", "0", "UUU"]
-    const validRatings = ["U", "PG", "12", "15", "18"]
-
-    for (const invalidRating of invalidRatings) {
-      const result = cinema.addNew("Invalid film", invalidRating, "2:08")
-      const expected = "Invalid rating"
-      expect(result).toEqual(expected)
-    }
-
-    for (const validRating of validRatings) {
-      const result = cinema.addNew("Film " + validRating, validRating, "2:08")
-      expect(result).toBeUndefined()
-    }
-  })
+    const result = cinema.createFilm("Invalid film", "hello", "2:08");
+    const expected = "Invalid rating";
+    expect(result).toEqual(expected);
+  });
 
   it("returns error trying to create film with invalid durations", () => {
-    const invalidDurations = ["0:00", "abc", "4", "1:61", "1:1"]
+    const result = cinema.createFilm("Film", "12", "700");
+    const expected = "Invalid duration";
+    expect(result).toEqual(expected);
+  });
 
-    for (const duration of invalidDurations) {
-      cinema = new Cinema()
-      const result = cinema.addNew("Film", "12", duration)
-      const expected = "Invalid duration"
-      expect(result).withContext(duration).toEqual(expected)
-    }
-  })
+  ////////
+
+  it("returns true that the ending time is valid", () => {
+    const result = cinema.isValidEndTime("12:30", "2:00");
+    expect(result).toEqual(true);
+  });
+
+  it("returns false that the ending time is invalid", () => {
+    const result = cinema.isValidEndTime("21:30", "2:30");
+    expect(result).toEqual(false);
+  });
 
   it("returns error trying to schedule showing when film does not exist", () => {
-    cinema.addNew("Film1", "12", "1:20")
-    cinema.save("Screen #1", 20)
-    const expected = "Invalid film"
-    const result = cinema.add("Film doesnt exist!", "Screen #1", "10:00")
-    expect(result).toBe(expected)
-  })
+    cinema.createFilm("Film1", "12", "1:20");
+    cinema.save("Screen #1", 20);
+    const expected = "Invalid film";
+    const result = cinema.add("Film doesnt exist!", "Screen #1", "10:00");
+    expect(result).toBe(expected);
+  });
 
   it("returns error trying to schedule showing when screen does not exist", () => {
-    cinema.addNew("Film1", "12", "1:20")
-    cinema.save("Screen #1", 20)
-    const expected = "Invalid screen"
-    const result = cinema.add("Film1", "Screen Doesnt exist", "10:00")
-    expect(result).toBe(expected)
-  })
+    cinema.addNew("Film1", "12", "1:20");
+    cinema.save("Screen #1", 20);
+    const expected = "Invalid screen";
+    const result = cinema.add("Film1", "Screen Doesnt exist", "10:00");
+    expect(result).toBe(expected);
+  });
 
   it("schedules single film", () => {
-    cinema.addNew("Film1", "12", "1:20")
-    cinema.save("Screen #1", 20)
+    cinema.addNew("Film1", "12", "1:20");
+    cinema.save("Screen #1", 20);
     const expected = {
-      "Film1" : [
-        "Screen #1 Film1 (12) 10:00 - 11:40"
-      ]
-    }
-    
-    cinema.add("Film1", "Screen #1", "10:00")
+      Film1: ["Screen #1 Film1 (12) 10:00 - 11:40"],
+    };
 
-    const result = cinema.allShowings()
-    expect(result).toEqual(expected)
-  })
+    cinema.add("Film1", "Screen #1", "10:00");
+
+    const result = cinema.allShowings();
+    expect(result).toEqual(expected);
+  });
 
   it("schedules same film on same screen", () => {
-    cinema.addNew("Film1", "12", "1:20")
-    cinema.save("Screen #1", 20)
+    cinema.addNew("Film1", "12", "1:20");
+    cinema.save("Screen #1", 20);
 
     const expected = {
-      "Film1" : [
+      Film1: [
         "Screen #1 Film1 (12) 10:00 - 11:40",
-        "Screen #1 Film1 (12) 12:10 - 13:50"
-      ]
-    }
-    
-    cinema.add("Film1", "Screen #1", "10:00")
-    cinema.add("Film1", "Screen #1", "12:10")
+        "Screen #1 Film1 (12) 12:10 - 13:50",
+      ],
+    };
 
-    const result = cinema.allShowings()
-    expect(result).toEqual(expected)
-  })
+    cinema.add("Film1", "Screen #1", "10:00");
+    cinema.add("Film1", "Screen #1", "12:10");
+
+    const result = cinema.allShowings();
+    expect(result).toEqual(expected);
+  });
 
   it("schedules same film on multiple screens", () => {
-    cinema.addNew("Film1", "12", "1:20")
-    cinema.save("Screen #1", 20)
-    cinema.save("Screen #2", 20)
+    cinema.addNew("Film1", "12", "1:20");
+    cinema.save("Screen #1", 20);
+    cinema.save("Screen #2", 20);
 
     const expected = {
-      "Film1" : [
+      Film1: [
         "Screen #1 Film1 (12) 10:00 - 11:40",
-        "Screen #2 Film1 (12) 10:00 - 11:40"
-      ]
-    }
-    
-    cinema.add("Film1", "Screen #1", "10:00")
-    cinema.add("Film1", "Screen #2", "10:00")
+        "Screen #2 Film1 (12) 10:00 - 11:40",
+      ],
+    };
 
-    const result = cinema.allShowings()
-    expect(result).toEqual(expected)
-  })
+    cinema.add("Film1", "Screen #1", "10:00");
+    cinema.add("Film1", "Screen #2", "10:00");
+
+    const result = cinema.allShowings();
+    expect(result).toEqual(expected);
+  });
 
   it("schedules multiple films on multiple screens", () => {
-    cinema.addNew("Film1", "12", "1:20")
-    cinema.addNew("Film2", "15", "2:00")
-    cinema.save("Screen #1", 20)
-    cinema.save("Screen #2", 20)
+    cinema.addNew("Film1", "12", "1:20");
+    cinema.addNew("Film2", "15", "2:00");
+    cinema.save("Screen #1", 20);
+    cinema.save("Screen #2", 20);
 
     const expected = {
-      "Film1" : [
+      Film1: [
         "Screen #1 Film1 (12) 10:00 - 11:40",
-        "Screen #2 Film1 (12) 12:00 - 13:40"
+        "Screen #2 Film1 (12) 12:00 - 13:40",
       ],
-      "Film2" : [
+      Film2: [
         "Screen #1 Film2 (15) 12:00 - 14:20",
-        "Screen #2 Film2 (15) 09:00 - 11:20"
-      ]
-    }
-    
-    cinema.add("Film1", "Screen #1", "10:00")
-    cinema.add("Film1", "Screen #2", "12:00")
+        "Screen #2 Film2 (15) 09:00 - 11:20",
+      ],
+    };
 
-    cinema.add("Film2", "Screen #1", "12:00")
-    cinema.add("Film2", "Screen #2", "09:00")
-    
+    cinema.add("Film1", "Screen #1", "10:00");
+    cinema.add("Film1", "Screen #2", "12:00");
 
-    const result = cinema.allShowings()
-    expect(result).toEqual(expected)
-  })
+    cinema.add("Film2", "Screen #1", "12:00");
+    cinema.add("Film2", "Screen #2", "09:00");
+
+    const result = cinema.allShowings();
+    expect(result).toEqual(expected);
+  });
 
   it("returns error when film screening overlaps start", () => {
-    cinema.addNew("Film1", "12", "1:00")
-    cinema.save("Screen #1", 20)
+    cinema.addNew("Film1", "12", "1:00");
+    cinema.save("Screen #1", 20);
 
-    cinema.add("Film1", "Screen #1", "10:00")
-    const result = cinema.add("Film1", "Screen #1", "11:00")
-    const expected = 'Time unavailable'
-    expect(result).toEqual(expected)
-  })
+    cinema.add("Film1", "Screen #1", "10:00");
+    const result = cinema.add("Film1", "Screen #1", "11:00");
+    const expected = "Time unavailable";
+    expect(result).toEqual(expected);
+  });
 
   it("returns error when film screening overlaps end", () => {
-    cinema.addNew("Film1", "12", "1:00")
-    cinema.save("Screen #1", 20)
+    cinema.addNew("Film1", "12", "1:00");
+    cinema.save("Screen #1", 20);
 
-    cinema.add("Film1", "Screen #1", "10:00")
-    const result = cinema.add("Film1", "Screen #1", "09:10")
-    const expected = 'Time unavailable'
-    expect(result).toEqual(expected)
-  })
+    cinema.add("Film1", "Screen #1", "10:00");
+    const result = cinema.add("Film1", "Screen #1", "09:10");
+    const expected = "Time unavailable";
+    expect(result).toEqual(expected);
+  });
 
   it("returns error when film screening overlaps all", () => {
-    cinema.addNew("Film1", "12", "1:00")
-    cinema.addNew("Film2", "12", "4:00")
-    cinema.save("Screen #1", 20)
+    cinema.addNew("Film1", "12", "1:00");
+    cinema.addNew("Film2", "12", "4:00");
+    cinema.save("Screen #1", 20);
 
-    cinema.add("Film1", "Screen #1", "10:00")
-    const result = cinema.add("Film2", "Screen #1", "08:30")
-    const expected = 'Time unavailable'
-    expect(result).toEqual(expected)
-  })
-})
+    cinema.add("Film1", "Screen #1", "10:00");
+    const result = cinema.add("Film2", "Screen #1", "08:30");
+    const expected = "Time unavailable";
+    expect(result).toEqual(expected);
+  });
+});
