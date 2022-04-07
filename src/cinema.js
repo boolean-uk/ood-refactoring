@@ -32,28 +32,35 @@ class Cinema {
         });
     }
 
-    //Add a new film
-    addNewFilmToFilmArray(movieName, rating, duration) {
-        //Check the film doesn't already exist
-        const ratings = ["U", "PG", "12", "15", , "18"];
-        let movie = null;
+    getFilm(movieName) {
+        let film = null;
         for (let i = 0; i < this.films.length; i++) {
             if (this.films[i].name == movieName) {
-                movie = this.films[i];
+                film = this.films[i];
+                break;
             }
         }
+        return film;
+    }
+
+    //Add a new film
+    addNewFilmToFilmArray(movieName, rating, duration) {
+        //Check the rating is valid
+
+        const ratings = ["U", "PG", "12", "15", , "18"];
+        if (ratings.includes(rating) === false) {
+            return "Invalid rating";
+        }
+        //Check the film doesn't already exist
+
+        let movie = this.getFilm(movieName);
 
         if (movie != null) {
             return "Film already exists";
         }
 
-        //Check the rating is valid
-
-        if (ratings.includes(rating) === false) {
-            return "Invalid rating";
-        }
-
         //Check duration
+
         const result = /^(\d?\d):(\d\d)$/.exec(duration);
 
         if (result == null) {
@@ -67,17 +74,6 @@ class Cinema {
         }
 
         this.films.push({ name: movieName, rating: rating, duration: duration });
-    }
-
-    getFilm(movieName) {
-        let film = null;
-        for (let i = 0; i < this.films.length; i++) {
-            if (this.films[i].name == movieName) {
-                film = this.films[i];
-                break;
-            }
-        }
-        return film;
     }
 
     getScreenByName(screenName) {
