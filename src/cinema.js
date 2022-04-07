@@ -55,64 +55,34 @@ class Cinema {
   }
 
   /*------------------ */
+  isValidEndTime(startTime, duration) {
+    const startHoursMins = startTime.split(":");
+    const durationHoursMins = duration.split(":");
+
+    const startHours = Number(startHoursMins[0]);
+    const startMins = Number(startHoursMins[1]);
+    const durationHours = Number(durationHoursMins[0]);
+    const durationMins = Number(durationHoursMins[1]);
+
+    let endHours = startHours + durationHours;
+
+    let endMins = startMins + durationMins + 20;
+    if (endMins >= 60) {
+      endHours += Math.floor(endMins / 60);
+      endMins = endMins % 60;
+    }
+
+    if (endHours >= 24) return false;
+
+    return true;
+  }
 
   //Add a showing for a specific film to a screen at the provided start time
-  add(movie, screenName, startTime) {
-    // split the startTime and extract the numbers
-    let result = /^(\d?\d):(\d\d)$/.exec(startTime);
-    // if the result(=startTime) is null, return an error
-    if (result == null) {
-      return "Invalid start time";
-    }
-    // extract the hours and the minutes from the result(=startTime)
-    const intendedStartTimeHours = parseInt(result[1]);
-    const intendedStartTimeMinutes = parseInt(result[2]);
-    // if the hours is/or 0 or minutes is more than 60, return an error
-    if (intendedStartTimeHours <= 0 || intendedStartTimeMinutes > 60) {
-      return "Invalid start time";
-    }
-
-    //Find the film by name
-    // if film is null, return an error
-    if (film === null) {
-      return "Invalid film";
-    }
-    // loop through the films array, and check if the film exists in the films array
-    let film = null;
-    for (let i = 0; i < this.films.length; i++) {
-      if (this.films[i].name == movie) {
-        film = this.films[i];
-      }
-    }
-
+  addFilmToScreen(filmName, screenName, startTime) {
+    if (findFilm(filmName)) return "Film already exists";
+    if (!isValidTime(startTime)) return "Invalid time";
     //From duration, work out intended end time
     //if end time is over midnight, it's an error
-    //Check duration
-    result = /^(\d?\d):(\d\d)$/.exec(film.duration);
-    // if result is null, return an error
-    if (result == null) {
-      return "Invalid duration";
-    }
-    // extract the hours and the minutes from the result(=the duration time of the film)
-    const durationHours = parseInt(result[1]);
-    const durationMins = parseInt(result[2]);
-
-    //Add the running time to the duration
-    let intendedEndTimeHours = intendedStartTimeHours + durationHours;
-
-    //It takes 20 minutes to clean the screen so add on 20 minutes to the duration
-    //when working out the end time
-    let intendedEndTimeMinutes = intendedStartTimeMinutes + durationMins + 20;
-    // it's converting the time (hour and minute) to time
-    if (intendedEndTimeMinutes >= 60) {
-      intendedEndTimeHours += Math.floor(intendedEndTimeMinutes / 60);
-      intendedEndTimeMinutes = intendedEndTimeMinutes % 60;
-    }
-
-    // if the intended end time hour is more than 24 (=past midnight), return an error
-    if (intendedEndTimeHours >= 24) {
-      return "Invalid start time - film ends after midnight";
-    }
 
     //Find the screen by name
     // loop through the screens array, and check if the screen exists

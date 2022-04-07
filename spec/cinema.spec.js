@@ -10,7 +10,6 @@ describe("Cinema", () => {
   it("creates new screens", () => {
     cinema.createScreen("Screen 1", 20);
     cinema.createScreen("Screen 2", 25);
-
     const expected = [
       {
         name: "Screen 1",
@@ -30,53 +29,43 @@ describe("Cinema", () => {
   it("returns error trying to create duplicate screen", () => {
     cinema.createScreen("Screen 1", 20);
     const result = cinema.createScreen("Screen 1", 25);
-
     const expected = "Screen already exists";
-
     expect(result).toEqual(expected);
   });
 
   it("returns error trying to create screen over capacity", () => {
     const result = cinema.createScreen("Screen 1", 250);
-
     const expected = "Exceeded max capacity";
-
     expect(result).toEqual(expected);
   });
 
   it("returns the rating is vaild", () => {
     const result = cinema.isValidRating("U");
-
     expect(result).toEqual(true);
   });
 
   it("returns the rating is vaild", () => {
     const result = cinema.isValidRating("UUU");
-
     expect(result).toEqual(false);
   });
 
   it("returns the time is vaild", () => {
     const result = cinema.isValidTime("2:40");
-
     expect(result).toEqual(true);
   });
 
   it("returns the time is invaild", () => {
     const result = cinema.isValidTime("34:70");
-
     expect(result).toEqual(false);
   });
 
   it("returns the time is invaild", () => {
     const result = cinema.isValidTime("340");
-
     expect(result).toEqual(false);
   });
 
   it("creates a new film", () => {
     cinema.createFilm("Nomad Land", "12", "1:48");
-
     const expected = [
       {
         name: "Nomad Land",
@@ -84,16 +73,13 @@ describe("Cinema", () => {
         duration: "1:48",
       },
     ];
-
     expect(cinema.films).toEqual(expected);
   });
 
   it("returns error trying to create duplicate film", () => {
     cinema.createFilm("Nomad Land", "12", "1:48");
     const result = cinema.createFilm("Nomad Land", "15", "2:08");
-
     const expected = "Film already exists";
-
     expect(result).toEqual(expected);
   });
 
@@ -109,8 +95,20 @@ describe("Cinema", () => {
     expect(result).toEqual(expected);
   });
 
+  ////////
+
+  it("returns true that the ending time is valid", () => {
+    const result = cinema.isValidEndTime("12:30", "2:00");
+    expect(result).toEqual(true);
+  });
+
+  it("returns false that the ending time is invalid", () => {
+    const result = cinema.isValidEndTime("21:30", "2:30");
+    expect(result).toEqual(false);
+  });
+
   it("returns error trying to schedule showing when film does not exist", () => {
-    cinema.addNew("Film1", "12", "1:20");
+    cinema.createFilm("Film1", "12", "1:20");
     cinema.save("Screen #1", 20);
     const expected = "Invalid film";
     const result = cinema.add("Film doesnt exist!", "Screen #1", "10:00");
