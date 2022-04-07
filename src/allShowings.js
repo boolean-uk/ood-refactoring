@@ -3,7 +3,7 @@ class AllShowings {
         this.screens = screens;
     }
 
-    allShowings() {
+    showAllShowings() {
         let showings = {};
         for (let i = 0; i < this.screens.length; i++) {
             const screen = this.screens[i];

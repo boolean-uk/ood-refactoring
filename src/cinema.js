@@ -1,4 +1,5 @@
 const ParseTime = require("./parseTime.js");
+const AllShowings = require("./allShowings.js");
 
 class Cinema {
     constructor() {
@@ -79,6 +80,17 @@ class Cinema {
         return film;
     }
 
+    getScreenByName(screenName) {
+        let theatre = null;
+        for (let i = 0; i < this.screens.length; i++) {
+            if (this.screens[i].name == screenName) {
+                theatre = this.screens[i];
+                break;
+            }
+        }
+        return theatre;
+    }
+
     //Add a showing for a specific film to a screen at the provided start time
     addShowingToScreenNameStartTime(movie, screenName, startTime) {
         // Intended start time of film
@@ -122,12 +134,7 @@ class Cinema {
         }
 
         //Find the screen by name
-        let theatre = null;
-        for (let i = 0; i < this.screens.length; i++) {
-            if (this.screens[i].name == screenName) {
-                theatre = this.screens[i];
-            }
-        }
+        let theatre = this.getScreenByName(screenName);
 
         if (theatre === null) {
             return "Invalid screen";
@@ -156,34 +163,26 @@ class Cinema {
             const endTimeMins = checkEndingTime.minutes();
 
             //if intended start time is between start and end
-            const d1 = new Date();
-            d1.setMilliseconds(0);
-            d1.setSeconds(0);
-            d1.setMinutes(intendedStartTimeMinutes);
-            d1.setHours(intendedStartTimeHours);
+            const intendedStartTime = new Date();
+            intendedStartTime.setMinutes(intendedStartTimeMinutes);
+            intendedStartTime.setHours(intendedStartTimeHours);
 
-            const d2 = new Date();
-            d2.setMilliseconds(0);
-            d2.setSeconds(0);
-            d2.setMinutes(intendedEndTimeMinutes);
-            d2.setHours(intendedEndTimeHours);
+            const intendedEndTime = new Date();
+            intendedEndTime.setMinutes(intendedEndTimeMinutes);
+            intendedEndTime.setHours(intendedEndTimeHours);
 
-            const d3 = new Date();
-            d3.setMilliseconds(0);
-            d3.setSeconds(0);
-            d3.setMinutes(startTimeMins);
-            d3.setHours(startTimeHours);
+            const startingTime = new Date();
+            startingTime.setMinutes(startTimeMins);
+            startingTime.setHours(startTimeHours);
 
-            const d4 = new Date();
-            d4.setMilliseconds(0);
-            d4.setSeconds(0);
-            d4.setMinutes(endTimeMins);
-            d4.setHours(endTimeHours);
+            const endingTime = new Date();
+            endingTime.setMinutes(endTimeMins);
+            endingTime.setHours(endTimeHours);
 
             if (
-                (d1 > d3 && d1 < d4) ||
-                (d2 > d3 && d2 < d4) ||
-                (d1 < d3 && d2 > d4)
+                (intendedStartTime > startingTime && intendedStartTime < endingTime) ||
+                (intendedEndTime > startingTime && intendedEndTime < endingTime) ||
+                (intendedStartTime < startingTime && intendedEndTime > endingTime)
             ) {
                 error = true;
                 break;
@@ -203,21 +202,8 @@ class Cinema {
     }
 
     allShowings() {
-        let showings = {};
-        for (let i = 0; i < this.screens.length; i++) {
-            const screen = this.screens[i];
-            for (let j = 0; j < screen.showings.length; j++) {
-                const showing = screen.showings[j];
-                if (!showings[showing.film.name]) {
-                    showings[showing.film.name] = [];
-                }
-                showings[showing.film.name].push(
-                    `${screen.name} ${showing.film.name} (${showing.film.rating}) ${showing.startTime} - ${showing.endTime}`
-                );
-            }
-        }
-
-        return showings;
+        const allShows = new AllShowings(this.screens);
+        return allShows.showAllShowings();
     }
 }
 
