@@ -4,27 +4,17 @@ class Cinema {
     this.screens = [];
   }
 
-  /*------------------ */
+  findScreen(screenName) {
+    const targetScreen = this.screens.find(
+      (screen) => screen.name === screenName
+    );
+    return targetScreen;
+  }
 
-  save(screenName, capacity) {
-    // if the capacity is more than 100, return an error
-    if (capacity > 100) {
-      return "Exceeded max capacity";
-    }
+  createScreen(screenName, capacity) {
+    if (capacity > 100) return "Exceeded max capacity";
+    if (this.findScreen(screenName)) return "Screen already exists";
 
-    //if the screen is null, return an error
-    if (screen != null) {
-      return "Screen already exists";
-    }
-
-    // go through the screen array, and check if the screen already exists
-    let screen = null;
-    for (let i = 0; i < this.screens.length; i++) {
-      if (this.screens[i].name === screenName) {
-        screen = this.screens[i];
-      }
-    }
-    // if the screen doesn't exist, push it in the screens array
     this.screens.push({
       name: screenName,
       capacity: capacity,

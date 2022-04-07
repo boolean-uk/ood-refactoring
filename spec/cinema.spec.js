@@ -1,4 +1,4 @@
-const Cinema = require("../src/cinema");
+const Cinema = require("../src/cinema.js");
 
 describe("Cinema", () => {
   let cinema;
@@ -8,8 +8,8 @@ describe("Cinema", () => {
   });
 
   it("creates new screens", () => {
-    cinema.save("Screen 1", 20);
-    cinema.save("Screen 2", 25);
+    cinema.createScreen("Screen 1", 20);
+    cinema.createScreen("Screen 2", 25);
 
     const expected = [
       {
@@ -28,10 +28,18 @@ describe("Cinema", () => {
   });
 
   it("returns error trying to create duplicate screen", () => {
-    cinema.save("Screen 1", 20);
-    const result = cinema.save("Screen 1", 25);
+    cinema.createScreen("Screen 1", 20);
+    const result = cinema.createScreen("Screen 1", 25);
 
     const expected = "Screen already exists";
+
+    expect(result).toEqual(expected);
+  });
+
+  fit("returns error trying to create screen over capacity", () => {
+    const result = cinema.createScreen("Screen 1", 250);
+
+    const expected = "Exceeded max capacity";
 
     expect(result).toEqual(expected);
   });
