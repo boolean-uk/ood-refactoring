@@ -24,46 +24,37 @@ class Cinema {
 
   /*------------------ */
 
-  addNew(movieName, r, duration) {
-    // if the movie is null, return an error
-    if (movie != null) {
-      return "Film already exists";
-    }
+  findFilm(filmName) {
+    const targetFilm = this.films.find((film) => film.name === filmName);
+    return targetFilm;
+  }
 
-    // go through the films array, and check if the film already exists
-    let movie = null;
-    for (let i = 0; i < this.films.length; i++) {
-      if (this.films[i].name == movieName) {
-        movie = this.films[i];
-      }
-    }
+  isValidRating(rating) {
+    const validRatings = ["U", "PG", "12", "15", "18"];
+    if (!validRatings.includes(rating)) return "Invalid rating";
+    return true;
+  }
 
-    //Check the rating is valid
-    //  if the rating is not "u", "PG", "12", "15","18", return an error
-    if (r != "U" && r != "PG") {
-      if (r != "12" && r != "15" && r != "18") {
-        return "Invalid rating";
-      }
-    }
+  isValidTime(time) {
+    const hoursMins = time.split(":");
+    const hours = Number(hoursMins[0]);
+    const mins = Number(hoursMins[1]);
 
-    //Check duration
-    // split the duration and extract the numbers
-    const result = /^(\d?\d):(\d\d)$/.exec(duration);
-    // if the result is null, return an error
-    if (result == null) {
-      return "Invalid duration";
-    }
+    if (!hoursMins.includes(":")) return "Invalid duration";
+    if (hours < 0 || mins > 60) return "Invalid duration";
+    return true;
+  }
 
-    // extract the hours and the minutes from the result(=duration)
-    const hours = parseInt(result[1]);
-    const mins = parseInt(result[2]);
-    // if the hours is/or 0 or minutes is more than 60, return an error
-    if (hours <= 0 || mins > 60) {
-      return "Invalid duration";
+  createFilm(filmName, rating, duration) {
+    const film = { name: filmName, rating: rating, duration: duration };
+    if (
+      !this.findFilm(filmName) &&
+      this.isValidRating(rating) &&
+      this.isValidTime(duration)
+    ) {
+      this.films.push(film);
     }
-
-    // if movie name, rating, duration are valid, push an film object to the films array
-    this.films.push({ name: movieName, rating: r, duration: duration });
+    return false;
   }
 
   /*------------------ */

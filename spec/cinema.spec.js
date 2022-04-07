@@ -36,7 +36,7 @@ describe("Cinema", () => {
     expect(result).toEqual(expected);
   });
 
-  fit("returns error trying to create screen over capacity", () => {
+  it("returns error trying to create screen over capacity", () => {
     const result = cinema.createScreen("Screen 1", 250);
 
     const expected = "Exceeded max capacity";
@@ -44,9 +44,38 @@ describe("Cinema", () => {
     expect(result).toEqual(expected);
   });
 
-  it("adds new films", () => {
-    cinema.addNew("Nomad Land", "12", "1:48");
-    cinema.addNew("The Power of the Dog", "15", "2:08");
+  it("returns the rating is vaild", () => {
+    const result = cinema.isValidRating("U");
+
+    expect(result).toEqual(true);
+  });
+
+  it("returns the rating is vaild", () => {
+    const result = cinema.isValidRating("UUU");
+
+    expect(result).toEqual("Invalid rating");
+  });
+
+  it("returns the time is vaild", () => {
+    const result = cinema.isValidTime("2:40");
+
+    expect(result).toEqual(true);
+  });
+
+  it("returns the time is invaild", () => {
+    const result = cinema.isValidTime("34:70");
+
+    expect(result).toEqual("Invalid duration");
+  });
+
+  it("returns the time is invaild", () => {
+    const result = cinema.isValidTime("340");
+
+    expect(result).toEqual("Invalid duration");
+  });
+
+  it("creates a new film", () => {
+    cinema.createFilm("Nomad Land", "12", "1:48");
 
     const expected = [
       {
@@ -54,21 +83,16 @@ describe("Cinema", () => {
         rating: "12",
         duration: "1:48",
       },
-      {
-        name: "The Power of the Dog",
-        rating: "15",
-        duration: "2:08",
-      },
     ];
 
     expect(cinema.films).toEqual(expected);
   });
 
-  it("returns error trying to create duplicate film", () => {
-    cinema.addNew("Nomad Land", "12", "1:48");
-    const result = cinema.addNew("Nomad Land", "15", "2:08");
+  fit("returns error trying to create duplicate film", () => {
+    cinema.createFilm("Nomad Land", "12", "1:48");
+    const result = cinema.createFilm("Nomad Land", "15", "2:08");
 
-    const expected = "Film already exists";
+    const expected = false;
 
     expect(result).toEqual(expected);
   });
