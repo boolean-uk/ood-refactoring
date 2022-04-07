@@ -1,10 +1,12 @@
 const Cinema = require("../src/cinema");
+const Showings = require("../src/showings.js");
 
 describe("Cinema", () => {
     let cinema;
 
     beforeEach(() => {
         cinema = new Cinema();
+        showing = new Showings();
     });
 
     it("creates new screens", () => {
@@ -229,15 +231,19 @@ describe("Cinema", () => {
 
     it("returns error when film screening overlaps all", () => {
         cinema.addNewFilmToFilmArray("Film1", "12", "1:00");
+
         cinema.addNewFilmToFilmArray("Film2", "12", "4:00");
+
         cinema.addNewScreenByNameCapacity("Screen #1", 20);
 
         cinema.addShowingToScreenNameStartTime("Film1", "Screen #1", "10:00");
+
         const result = cinema.addShowingToScreenNameStartTime(
             "Film2",
             "Screen #1",
             "08:30"
         );
+
         const expected = "Time unavailable";
         expect(result).toEqual(expected);
     });

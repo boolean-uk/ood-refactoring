@@ -1,3 +1,5 @@
+const ParseTime = require("./parseTime.js");
+
 class Cinema {
     constructor() {
         this.films = [];
@@ -66,29 +68,37 @@ class Cinema {
         this.films.push({ name: movieName, rating: rating, duration: duration });
     }
 
+    getFilm(movieName) {
+        let film = null;
+        for (let i = 0; i < this.films.length; i++) {
+            if (this.films[i].name == movieName) {
+                film = this.films[i];
+                break;
+            }
+        }
+        return film;
+    }
+
     //Add a showing for a specific film to a screen at the provided start time
     addShowingToScreenNameStartTime(movie, screenName, startTime) {
         // Intended start time of film
 
-        let filmStartTime = /^(\d?\d):(\d\d)$/.exec(startTime);
-        if (filmStartTime == null) {
-            return "Invalid start time";
-        }
+        const startingTime = new ParseTime(startTime);
+        startingTime.isValid();
 
-        const intendedStartTimeHours = parseInt(filmStartTime[1]);
-        const intendedStartTimeMinutes = parseInt(filmStartTime[2]);
-        if (intendedStartTimeHours <= 0 || intendedStartTimeMinutes > 60) {
-            return "Invalid start time";
-        }
+        // let filmStartTime = /^(\d?\d):(\d\d)$/.exec(startTime);
+        // if (filmStartTime == null) {
+        //     return "Invalid start time";
+        // }
+
+        const intendedStartTimeHours = startingTime.hours();
+        const intendedStartTimeMinutes = startingTime.minutes();
+        // if (intendedStartTimeHours <= 0 || intendedStartTimeMinutes > 60) {
+        //     return "Invalid start time";
+        // }
 
         //Find the film by name
-        let film = null;
-
-        for (let i = 0; i < this.films.length; i++) {
-            if (this.films[i].name == movie) {
-                film = this.films[i];
-            }
-        }
+        let film = this.getFilm(movie);
 
         if (film === null) {
             return "Invalid film";
@@ -98,13 +108,16 @@ class Cinema {
         //if end time is over midnight, it's an error
         //Check duration
 
-        let filmDurationTime = /^(\d?\d):(\d\d)$/.exec(film.duration);
-        if (filmDurationTime == null) {
-            return "Invalid duration";
-        }
+        const filmDurationTime = new ParseTime(film.duration);
+        filmDurationTime.isValid();
 
-        const durationHours = parseInt(filmDurationTime[1]);
-        const durationMins = parseInt(filmDurationTime[2]);
+        // let filmDurationTime = /^(\d?\d):(\d\d)$/.exec(film.duration);
+        // if (filmDurationTime == null) {
+        //     return "Invalid duration";
+        // }
+
+        const durationHours = filmDurationTime.hours();
+        const durationMins = filmDurationTime.minutes();
 
         //Add the running time to the duration
         let intendedEndTimeHours = intendedStartTimeHours + durationHours;
@@ -139,29 +152,36 @@ class Cinema {
         for (let i = 0; i < theatre.showings.length; i++) {
             //Get the start time in hours and minutes
             const startTime = theatre.showings[i].startTime;
-            let startTimeFromTheatreShowings = /^(\d?\d):(\d\d)$/.exec(startTime);
-            if (startTimeFromTheatreShowings == null) {
-                return "Invalid start time";
-            }
 
-            const startTimeHours = parseInt(startTimeFromTheatreShowings[1]);
-            const startTimeMins = parseInt(startTimeFromTheatreShowings[2]);
-            if (startTimeHours <= 0 || startTimeMins > 60) {
-                return "Invalid start time";
-            }
+            const startTimeFromTheatreShowings = new ParseTime(startTime);
+            startTimeFromTheatreShowings.isValid();
+            // let startTimeFromTheatreShowings = /^(\d?\d):(\d\d)$/.exec();
+            // if (startTimeFromTheatreShowings == null) {
+            //     return "Invalid start time";
+            // }
+
+            const startTimeHours = startTimeFromTheatreShowings.hours();
+            const startTimeMins = startTimeFromTheatreShowings.minutes();
+            // if (startTimeHours <= 0 || startTimeMins > 60) {
+            //     return "Invalid start time";
+            // }
 
             //Get the end time in hours and minutes
             const endTime = theatre.showings[i].endTime;
-            let west = /^(\d?\d):(\d\d)$/.exec(endTime);
-            if (west == null) {
-                return "Invalid end time";
-            }
 
-            const endTimeHours = parseInt(west[1]);
-            const endTimeMins = parseInt(west[2]);
-            if (endTimeHours <= 0 || endTimeMins > 60) {
-                return "Invalid end time";
-            }
+            const checkEndingTime = new ParseTime(endTime);
+            checkEndingTime.isValid();
+
+            // let checkEndingTime = /^(\d?\d):(\d\d)$/.exec(endTime);
+            // if (checkEndingTime == null) {
+            //     return "Invalid end time";
+            // }
+
+            const endTimeHours = checkEndingTime.hours();
+            const endTimeMins = checkEndingTime.minutes();
+            // if (endTimeHours <= 0 || endTimeMins > 60) {
+            //     return "Invalid end time";
+            // }
 
             //if intended start time is between start and end
             const d1 = new Date();
