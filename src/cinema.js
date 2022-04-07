@@ -1,7 +1,7 @@
 class Cinema {
   constructor() {
     this.films = [];
-    this.screens = [];
+    this.theatres = [];
   }
 
   //Add a new screen
@@ -12,9 +12,9 @@ class Cinema {
 
     //Check the screen doesn't already exist
     let screen = null;
-    for (let i = 0; i < this.screens.length; i++) {
-      if (this.screens[i].name === screenName) {
-        screen = this.screens[i];
+    for (let i = 0; i < this.theatres.length; i++) {
+      if (this.theatres[i].name === screenName) {
+        screen = this.theatres[i];
       }
     }
 
@@ -22,7 +22,7 @@ class Cinema {
       return "Screen already exists";
     }
 
-    this.screens.push({
+    this.theatres.push({
       name: screenName,
       capacity: capacity,
       showings: [],
@@ -68,10 +68,8 @@ class Cinema {
   //Add a showing for a specific film to a screen at the provided start time
   add(movie, screenName, startTime) {
     if (!this.isValidTime(startTime)) return "Invalid start time";
-    const splitStartTime = this.splitHoursAndMinutes(startTime);
-
-    const intendedStartTimeHours = splitStartTime[0];
-    const intendedStartTimeMinutes = splitStartTime[1];
+    const [intendedStartTimeHours, intendedStartTimeMinutes] =
+      this.passHoursAndMinutes(startTime);
 
     //Find the film by name
     const film = this.getFilm(movie);
@@ -81,9 +79,9 @@ class Cinema {
     //if end time is over midnight, it's an error
     //Check duration
     if (!this.isValidTime(film.duration)) return "Invalid duration";
-    const splitFilmDuration = this.splitHoursAndMinutes(film.duration);
-    const durationHours = splitFilmDuration[0];
-    const durationMins = splitFilmDuration[1];
+    const [durationHours, durationMins] = this.passHoursAndMinutes(
+      film.duration
+    );
 
     //Add the running time to the duration
     let intendedEndTimeHours = intendedStartTimeHours + durationHours;
@@ -109,49 +107,30 @@ class Cinema {
     let error = false;
     for (let i = 0; i < theatre.showings.length; i++) {
       //Get the start time in hours and minutes
-      const startTime = theatre.showings[i].startTime;
-      if (!this.isValidTime(startTime)) return "Invalid start time";
-      const splitStartTime = this.splitHoursAndMinutes(startTime);
-      const startTimeHours = splitStartTime[0];
-      const startTimeMins = splitStartTime[1];
+      const [existingShowingStartTimeHours, existingShowingStartTimeMins] =
+        this.passHoursAndMinutes(theatre.showings[i].startTime);
 
       //Get the end time in hours and minutes
-      const endTime = theatre.showings[i].endTime;
-      let result = /^(\d?\d):(\d\d)$/.exec(endTime);
-      if (result == null) {
-        return "Invalid end time";
-      }
-
-      const endTimeHours = parseInt(result[1]);
-      const endTimeMins = parseInt(result[2]);
-      if (endTimeHours <= 0 || endTimeMins > 60) {
-        return "Invalid end time";
-      }
+      const [existingShowingEndTimeHours, existingShowingEndTimeMins] =
+        this.passHoursAndMinutes(theatre.showings[i].endTime);
 
       //if intended start time is between start and end
-      const d1 = new Date();
-      d1.setMilliseconds(0);
-      d1.setSeconds(0);
-      d1.setMinutes(intendedStartTimeMinutes);
-      d1.setHours(intendedStartTimeHours);
-
-      const d2 = new Date();
-      d2.setMilliseconds(0);
-      d2.setSeconds(0);
-      d2.setMinutes(intendedEndTimeMinutes);
-      d2.setHours(intendedEndTimeHours);
-
-      const d3 = new Date();
-      d3.setMilliseconds(0);
-      d3.setSeconds(0);
-      d3.setMinutes(startTimeMins);
-      d3.setHours(startTimeHours);
-
-      const d4 = new Date();
-      d4.setMilliseconds(0);
-      d4.setSeconds(0);
-      d4.setMinutes(endTimeMins);
-      d4.setHours(endTimeHours);
+      const d1 = this.createDateWithSetTime(
+        intendedStartTimeHours,
+        intendedStartTimeMinutes
+      );
+      const d2 = this.createDateWithSetTime(
+        intendedEndTimeHours,
+        intendedEndTimeMinutes
+      );
+      const d3 = this.createDateWithSetTime(
+        existingShowingStartTimeHours,
+        existingShowingStartTimeMins
+      );
+      const d4 = this.createDateWithSetTime(
+        existingShowingEndTimeHours,
+        existingShowingEndTimeMins
+      );
 
       if (
         (d1 > d3 && d1 < d4) ||
@@ -177,8 +156,8 @@ class Cinema {
 
   allShowings() {
     let showings = {};
-    for (let i = 0; i < this.screens.length; i++) {
-      const screen = this.screens[i];
+    for (let i = 0; i < this.theatres.length; i++) {
+      const screen = this.theatres[i];
       for (let j = 0; j < screen.showings.length; j++) {
         const showing = screen.showings[j];
         if (!showings[showing.film.name]) {
@@ -194,7 +173,7 @@ class Cinema {
   }
 
   getTheatre(screenName) {
-    return this.screens.find((el) => el.name === screenName);
+    return this.theatres.find((el) => el.name === screenName);
   }
 
   getFilm(filmName) {
@@ -216,6 +195,18 @@ class Cinema {
     if (hours <= 0 || minutes > 60) return false;
 
     return true;
+  }
+
+  createDateWithSetTime(hours, minutes) {
+    const date = new Date();
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    return date;
+  }
+
+  passHoursAndMinutes(time) {
+    const timeArr = this.splitHoursAndMinutes(time);
+    return [...timeArr];
   }
 }
 
