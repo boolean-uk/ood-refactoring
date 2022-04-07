@@ -88,7 +88,7 @@ describe("Cinema", () => {
     expect(cinema.films).toEqual(expected);
   });
 
-  fit("returns error trying to create duplicate film", () => {
+  it("returns error trying to create duplicate film", () => {
     cinema.createFilm("Nomad Land", "12", "1:48");
     const result = cinema.createFilm("Nomad Land", "15", "2:08");
 
@@ -98,30 +98,15 @@ describe("Cinema", () => {
   });
 
   it("returns error trying to create film with invalid rating", () => {
-    const invalidRatings = ["20", "0", "UUU"];
-    const validRatings = ["U", "PG", "12", "15", "18"];
-
-    for (const invalidRating of invalidRatings) {
-      const result = cinema.addNew("Invalid film", invalidRating, "2:08");
-      const expected = "Invalid rating";
-      expect(result).toEqual(expected);
-    }
-
-    for (const validRating of validRatings) {
-      const result = cinema.addNew("Film " + validRating, validRating, "2:08");
-      expect(result).toBeUndefined();
-    }
+    const result = cinema.createFilm("Invalid film", "hello", "2:08");
+    const expected = false;
+    expect(result).toEqual(expected);
   });
 
   it("returns error trying to create film with invalid durations", () => {
-    const invalidDurations = ["0:00", "abc", "4", "1:61", "1:1"];
-
-    for (const duration of invalidDurations) {
-      cinema = new Cinema();
-      const result = cinema.addNew("Film", "12", duration);
-      const expected = "Invalid duration";
-      expect(result).withContext(duration).toEqual(expected);
-    }
+    const result = cinema.createFilm("Film", "12", "700");
+    const expected = false;
+    expect(result).toEqual(expected);
   });
 
   it("returns error trying to schedule showing when film does not exist", () => {
