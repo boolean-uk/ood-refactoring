@@ -86,16 +86,8 @@ class Cinema {
         const startingTime = new ParseTime(startTime);
         startingTime.isValid();
 
-        // let filmStartTime = /^(\d?\d):(\d\d)$/.exec(startTime);
-        // if (filmStartTime == null) {
-        //     return "Invalid start time";
-        // }
-
         const intendedStartTimeHours = startingTime.hours();
         const intendedStartTimeMinutes = startingTime.minutes();
-        // if (intendedStartTimeHours <= 0 || intendedStartTimeMinutes > 60) {
-        //     return "Invalid start time";
-        // }
 
         //Find the film by name
         let film = this.getFilm(movie);
@@ -110,11 +102,6 @@ class Cinema {
 
         const filmDurationTime = new ParseTime(film.duration);
         filmDurationTime.isValid();
-
-        // let filmDurationTime = /^(\d?\d):(\d\d)$/.exec(film.duration);
-        // if (filmDurationTime == null) {
-        //     return "Invalid duration";
-        // }
 
         const durationHours = filmDurationTime.hours();
         const durationMins = filmDurationTime.minutes();
@@ -155,16 +142,9 @@ class Cinema {
 
             const startTimeFromTheatreShowings = new ParseTime(startTime);
             startTimeFromTheatreShowings.isValid();
-            // let startTimeFromTheatreShowings = /^(\d?\d):(\d\d)$/.exec();
-            // if (startTimeFromTheatreShowings == null) {
-            //     return "Invalid start time";
-            // }
 
             const startTimeHours = startTimeFromTheatreShowings.hours();
             const startTimeMins = startTimeFromTheatreShowings.minutes();
-            // if (startTimeHours <= 0 || startTimeMins > 60) {
-            //     return "Invalid start time";
-            // }
 
             //Get the end time in hours and minutes
             const endTime = theatre.showings[i].endTime;
@@ -172,16 +152,8 @@ class Cinema {
             const checkEndingTime = new ParseTime(endTime);
             checkEndingTime.isValid();
 
-            // let checkEndingTime = /^(\d?\d):(\d\d)$/.exec(endTime);
-            // if (checkEndingTime == null) {
-            //     return "Invalid end time";
-            // }
-
             const endTimeHours = checkEndingTime.hours();
             const endTimeMins = checkEndingTime.minutes();
-            // if (endTimeHours <= 0 || endTimeMins > 60) {
-            //     return "Invalid end time";
-            // }
 
             //if intended start time is between start and end
             const d1 = new Date();
