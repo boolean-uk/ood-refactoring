@@ -22,16 +22,15 @@ class Cinema {
     });
   }
 
-  /*------------------ */
-
   findFilm(filmName) {
     const targetFilm = this.films.find((film) => film.name === filmName);
+    if (!targetFilm) return false;
     return targetFilm;
   }
 
   isValidRating(rating) {
     const validRatings = ["U", "PG", "12", "15", "18"];
-    if (!validRatings.includes(rating)) return "Invalid rating";
+    if (!validRatings.includes(rating)) return false;
     return true;
   }
 
@@ -40,21 +39,19 @@ class Cinema {
     const hours = Number(hoursMins[0]);
     const mins = Number(hoursMins[1]);
 
-    if (!hoursMins.includes(":")) return "Invalid duration";
-    if (hours < 0 || mins > 60) return "Invalid duration";
+    if (!time.includes(":")) return false;
+    if (hours < 0 || mins > 60) return false;
     return true;
   }
 
   createFilm(filmName, rating, duration) {
     const film = { name: filmName, rating: rating, duration: duration };
-    if (
-      !this.findFilm(filmName) &&
-      this.isValidRating(rating) &&
-      this.isValidTime(duration)
-    ) {
-      this.films.push(film);
-    }
-    return false;
+
+    if (this.findFilm(filmName)) return "Film already exists";
+    if (!this.isValidRating(rating)) return "Invalid rating";
+    if (!this.isValidTime(duration)) return "Invalid duration";
+
+    this.films.push(film);
   }
 
   /*------------------ */

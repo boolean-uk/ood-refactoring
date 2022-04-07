@@ -53,7 +53,7 @@ describe("Cinema", () => {
   it("returns the rating is vaild", () => {
     const result = cinema.isValidRating("UUU");
 
-    expect(result).toEqual("Invalid rating");
+    expect(result).toEqual(false);
   });
 
   it("returns the time is vaild", () => {
@@ -65,13 +65,13 @@ describe("Cinema", () => {
   it("returns the time is invaild", () => {
     const result = cinema.isValidTime("34:70");
 
-    expect(result).toEqual("Invalid duration");
+    expect(result).toEqual(false);
   });
 
   it("returns the time is invaild", () => {
     const result = cinema.isValidTime("340");
 
-    expect(result).toEqual("Invalid duration");
+    expect(result).toEqual(false);
   });
 
   it("creates a new film", () => {
@@ -92,20 +92,20 @@ describe("Cinema", () => {
     cinema.createFilm("Nomad Land", "12", "1:48");
     const result = cinema.createFilm("Nomad Land", "15", "2:08");
 
-    const expected = false;
+    const expected = "Film already exists";
 
     expect(result).toEqual(expected);
   });
 
   it("returns error trying to create film with invalid rating", () => {
     const result = cinema.createFilm("Invalid film", "hello", "2:08");
-    const expected = false;
+    const expected = "Invalid rating";
     expect(result).toEqual(expected);
   });
 
   it("returns error trying to create film with invalid durations", () => {
     const result = cinema.createFilm("Film", "12", "700");
-    const expected = false;
+    const expected = "Invalid duration";
     expect(result).toEqual(expected);
   });
 
