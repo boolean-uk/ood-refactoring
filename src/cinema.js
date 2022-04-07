@@ -67,7 +67,7 @@ class Cinema {
 
   //Add a showing for a specific film to a screen at the provided start time
   add(movie, screenName, startTime) {
-    if (!this.isValidStartTime(startTime)) return "Invalid start time";
+    if (!this.isValidTime(startTime)) return "Invalid start time";
     const splitStartTime = this.splitHoursAndMinutes(startTime);
 
     const intendedStartTimeHours = splitStartTime[0];
@@ -80,13 +80,10 @@ class Cinema {
     //From duration, work out intended end time
     //if end time is over midnight, it's an error
     //Check duration
-    let result = /^(\d?\d):(\d\d)$/.exec(film.duration);
-    if (result == null) {
-      return "Invalid duration";
-    }
-
-    const durationHours = parseInt(result[1]);
-    const durationMins = parseInt(result[2]);
+    if (!this.isValidTime(film.duration)) return "Invalid duration";
+    const splitFilmDuration = this.splitHoursAndMinutes(film.duration);
+    const durationHours = splitFilmDuration[0];
+    const durationMins = splitFilmDuration[1];
 
     //Add the running time to the duration
     let intendedEndTimeHours = intendedStartTimeHours + durationHours;
@@ -113,20 +110,14 @@ class Cinema {
     for (let i = 0; i < theatre.showings.length; i++) {
       //Get the start time in hours and minutes
       const startTime = theatre.showings[i].startTime;
-      result = /^(\d?\d):(\d\d)$/.exec(startTime);
-      if (result == null) {
-        return "Invalid start time";
-      }
-
-      const startTimeHours = parseInt(result[1]);
-      const startTimeMins = parseInt(result[2]);
-      if (startTimeHours <= 0 || startTimeMins > 60) {
-        return "Invalid start time";
-      }
+      if (!this.isValidTime(startTime)) return "Invalid start time";
+      const splitStartTime = this.splitHoursAndMinutes(startTime);
+      const startTimeHours = splitStartTime[0];
+      const startTimeMins = splitStartTime[1];
 
       //Get the end time in hours and minutes
       const endTime = theatre.showings[i].endTime;
-      result = /^(\d?\d):(\d\d)$/.exec(endTime);
+      let result = /^(\d?\d):(\d\d)$/.exec(endTime);
       if (result == null) {
         return "Invalid end time";
       }
@@ -215,12 +206,13 @@ class Cinema {
     return splitTime.length === 2 ? splitTime : null;
   }
 
-  isValidStartTime(startTime) {
-    const splitStartTime = this.splitHoursAndMinutes(startTime);
-    if (splitStartTime == null) return false;
+  isValidTime(time) {
+    const splitTime = this.splitHoursAndMinutes(time);
+    if (splitTime == null) return false;
 
-    const hours = splitStartTime[0];
-    const minutes = splitStartTime[1];
+    const hours = splitTime[0];
+    const minutes = splitTime[1];
+
     if (hours <= 0 || minutes > 60) return false;
 
     return true;
